@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	xerrors "github.com/heffcodex/xbun/errors"
+	"github.com/heffcodex/xbun/xerr"
 )
 
 type affectedXArgs struct {
@@ -17,7 +17,7 @@ type affectedXArgs struct {
 }
 
 func testAffectedX(t *testing.T, fn AffectedFn, tests []affectedXArgs) {
-	wantErr := &xerrors.AffectedRowsError{}
+	wantErr := &xerr.AffectedRowsError{}
 
 	for i, tt := range tests {
 		t.Run("test_"+strconv.Itoa(i), func(t *testing.T) {
@@ -104,8 +104,8 @@ func (d dummyResult) RowsAffected() (int64, error) {
 
 func TestExpectSuccess(t *testing.T) {
 	assert.NoError(t, ExpectSuccess(nil))
-	assert.ErrorAs(t, ExpectSuccess(sql.ErrNoRows), &xerrors.AffectedRowsError{})
-	assert.ErrorAs(t, ExpectSuccess(errors.New("")), &xerrors.QueryExecutionError{})
+	assert.ErrorAs(t, ExpectSuccess(sql.ErrNoRows), &xerr.AffectedRowsError{})
+	assert.ErrorAs(t, ExpectSuccess(errors.New("")), &xerr.QueryExecutionError{})
 }
 
 func TestExpectResult(t *testing.T) {
@@ -127,17 +127,17 @@ func TestExpectResult(t *testing.T) {
 	})
 
 	t.Run("mismatch", func(t *testing.T) {
-		assert.ErrorAs(t, ExpectResult(dummyResult{affected: 1}, nil, AffectedGT(1)), &xerrors.AffectedRowsError{})
+		assert.ErrorAs(t, ExpectResult(dummyResult{affected: 1}, nil, AffectedGT(1)), &xerr.AffectedRowsError{})
 	})
 
 	t.Run("no rows", func(t *testing.T) {
 		assert.NoError(t, ExpectResult(dummyResult{}, sql.ErrNoRows, AffectedExactly(0)))
-		assert.ErrorAs(t, ExpectResult(dummyResult{}, sql.ErrNoRows), &xerrors.AffectedRowsError{})
-		assert.ErrorAs(t, ExpectResult(dummyResult{}, sql.ErrNoRows, AffectedGT(0)), &xerrors.AffectedRowsError{})
+		assert.ErrorAs(t, ExpectResult(dummyResult{}, sql.ErrNoRows), &xerr.AffectedRowsError{})
+		assert.ErrorAs(t, ExpectResult(dummyResult{}, sql.ErrNoRows, AffectedGT(0)), &xerr.AffectedRowsError{})
 	})
 
 	t.Run("query error", func(t *testing.T) {
-		assert.ErrorAs(t, ExpectResult(dummyResult{}, errors.New("")), &xerrors.QueryExecutionError{})
+		assert.ErrorAs(t, ExpectResult(dummyResult{}, errors.New("")), &xerr.QueryExecutionError{})
 	})
 
 	t.Run("affected rows error", func(t *testing.T) {

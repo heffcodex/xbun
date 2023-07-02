@@ -1,7 +1,13 @@
-package xerrors
+package xerr
+
+import "errors"
 
 type QueryExecutionError struct {
 	err error
+}
+
+func IsQueryExecution(err error) bool {
+	return errors.As(err, &QueryExecutionError{})
 }
 
 func ErrQueryExecution(err error) QueryExecutionError {

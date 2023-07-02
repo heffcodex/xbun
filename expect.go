@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	xerrors "github.com/heffcodex/xbun/errors"
+	"github.com/heffcodex/xbun/xerr"
 )
 
 type (
@@ -17,7 +17,7 @@ type (
 func AffectedExactly(expected int64) AffectedCond {
 	return func(actual int64) error {
 		if expected != actual {
-			return xerrors.ErrAffectedRows(expected, actual, xerrors.AffectedExactly)
+			return xerr.ErrAffectedRows(expected, actual, xerr.AffectedExactly)
 		}
 
 		return nil
@@ -28,7 +28,7 @@ func AffectedExactly(expected int64) AffectedCond {
 func AffectedNot(expected int64) AffectedCond {
 	return func(actual int64) error {
 		if expected == actual {
-			return xerrors.ErrAffectedRows(expected, actual, xerrors.AffectedNot)
+			return xerr.ErrAffectedRows(expected, actual, xerr.AffectedNot)
 		}
 
 		return nil
@@ -39,7 +39,7 @@ func AffectedNot(expected int64) AffectedCond {
 func AffectedLT(expected int64) AffectedCond {
 	return func(actual int64) error {
 		if expected <= actual {
-			return xerrors.ErrAffectedRows(expected, actual, xerrors.AffectedLT)
+			return xerr.ErrAffectedRows(expected, actual, xerr.AffectedLT)
 		}
 
 		return nil
@@ -50,7 +50,7 @@ func AffectedLT(expected int64) AffectedCond {
 func AffectedLTE(expected int64) AffectedCond {
 	return func(actual int64) error {
 		if expected < actual {
-			return xerrors.ErrAffectedRows(expected, actual, xerrors.AffectedLTE)
+			return xerr.ErrAffectedRows(expected, actual, xerr.AffectedLTE)
 		}
 
 		return nil
@@ -61,7 +61,7 @@ func AffectedLTE(expected int64) AffectedCond {
 func AffectedGT(expected int64) AffectedCond {
 	return func(actual int64) error {
 		if expected >= actual {
-			return xerrors.ErrAffectedRows(expected, actual, xerrors.AffectedGT)
+			return xerr.ErrAffectedRows(expected, actual, xerr.AffectedGT)
 		}
 
 		return nil
@@ -72,7 +72,7 @@ func AffectedGT(expected int64) AffectedCond {
 func AffectedGTE(expected int64) AffectedCond {
 	return func(actual int64) error {
 		if expected > actual {
-			return xerrors.ErrAffectedRows(expected, actual, xerrors.AffectedGTE)
+			return xerr.ErrAffectedRows(expected, actual, xerr.AffectedGTE)
 		}
 
 		return nil
@@ -81,26 +81,26 @@ func AffectedGTE(expected int64) AffectedCond {
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
 
-// ExpectSuccess checks if the query returns no errors.
-// If the query returns an error, it returns the error wrapped in a xerrors.QueryExecutionError.
-// If the query returns sql.ErrNoRows, it works like AffectedNot(0)(0) ie returns an xerrors.AffectedRowsError.
+// ExpectSuccess checks if the query returns no xerr.
+// If the query returns an error, it returns the error wrapped in a xerr.QueryExecutionError.
+// If the query returns sql.ErrNoRows, it works like AffectedNot(0)(0) ie returns an xerr.AffectedRowsError.
 func ExpectSuccess(err error) error {
 	if errors.Is(err, sql.ErrNoRows) {
 		return AffectedNot(0)(0)
 	} else if err != nil {
-		return xerrors.ErrQueryExecution(err)
+		return xerr.ErrQueryExecution(err)
 	}
 
 	return nil
 }
 
-// ExpectResult checks if the query returns no errors and the desired cond is met.
+// ExpectResult checks if the query returns no xerr and the desired cond is met.
 //
 // If cond is not provided, it works like ExpectSuccess ie checks only the err passed in.
-// If cond is not met, it returns a xerrors.AffectedRowsError.
+// If cond is not met, it returns a xerr.AffectedRowsError.
 //
 // If sql.ErrNoRows passed as an err, it is being omitted and further check is performed as for zero-row result.
-// For any other error, it returns an error wrapped in a xerrors.QueryExecutionError.
+// For any other error, it returns an error wrapped in a xerr.QueryExecutionError.
 //
 // Note that RowsAffected() call on sql.Result may not be supported by the driver, so it will cause an error.
 func ExpectResult(result sql.Result, err error, cond ...AffectedCond) error {
@@ -122,7 +122,7 @@ func ExpectResult(result sql.Result, err error, cond ...AffectedCond) error {
 	if errors.Is(err, sql.ErrNoRows) {
 		return _cond(0)
 	} else if err != nil {
-		return xerrors.ErrQueryExecution(err)
+		return xerr.ErrQueryExecution(err)
 	}
 
 	actual, rowsErr := result.RowsAffected()
