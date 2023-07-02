@@ -1,6 +1,9 @@
 package xerrors
 
-import "strconv"
+import (
+	"errors"
+	"strconv"
+)
 
 type AffectedCond string
 
@@ -17,6 +20,10 @@ type AffectedRowsError struct {
 	actual   int64
 	expected int64
 	cond     AffectedCond
+}
+
+func IsAffectedRows(err error) bool {
+	return errors.As(err, &AffectedRowsError{})
 }
 
 func ErrAffectedRows(expected, actual int64, cond AffectedCond) error {
