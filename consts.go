@@ -4,6 +4,7 @@ package xbun
 const (
 	SepAND = " AND "
 	SepOR  = " OR "
+	SepNOT = " NOT "
 )
 
 // RETURNING clause argument constraints.

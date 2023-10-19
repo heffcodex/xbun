@@ -1,0 +1,562 @@
+run:
+  timeout: 5m
+  issues-exit-code: 1
+  tests: true
+  modules-download-mode: readonly
+  go: ""
+
+output:
+  format: line-number
+  print-issued-lines: false
+  print-linter-name: true
+  uniq-by-line: true
+  sort-results: true
+
+linters-settings:
+  dogsled:
+    max-blank-identifiers: 2
+
+  dupl:
+    threshold: 150
+
+  errcheck:
+    check-type-assertions: true
+    check-blank: false
+    disable-default-exclusions: false
+    exclude-functions: []
+
+  errorlint:
+    errorf: true
+    errorf-multi: false
+    asserts: true
+    comparison: true
+
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(github.com/heffcodex/xbun)
+    skip-generated: true
+    custom-order: true
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+      - opinionated
+    disabled-tags:
+      - experimental
+
+    enabled-checks:
+      - tooManyResultsChecker
+      - nestingReduce
+      - unnamedResult
+      - truncateCmp
+    disabled-checks: []
+
+    settings:
+      captLocal:
+        paramsOnly: false
+      elseif:
+        skipBalanced: true
+      hugeParam:
+        sizeThreshold: 80
+      ifElseChain:
+        minThreshold: 2
+      nestingReduce:
+        bodyWidth: 5
+      rangeExprCopy:
+        sizeThreshold: 512
+        skipTestFuncs: true
+      rangeValCopy:
+        sizeThreshold: 128
+        skipTestFuncs: true
+      ruleguard: {}
+      tooManyResultsChecker:
+        maxResults: 3
+      truncateCmp:
+        skipArchDependent: true
+      underef:
+        skipRecvDeref: true
+      unnamedResult:
+        checkExported: false
+
+  godot:
+    scope: declarations
+    exclude:
+      - "^bug:"
+      - "^hack:"
+      - "^todo:"
+      - "^fixme:"
+    period: true
+    capital: false
+
+  gomodguard:
+    blocked:
+      modules:
+        - github.com/pkg/errors:
+            recommendations:
+              - fmt
+              - errors
+            reason: "should not be used since Go 1.13"
+      local_replace_directives: false
+
+  gosec:
+    excludes: []
+    exclude-generated: true
+    severity: low
+    confidence: low
+    config:
+      global:
+        nosec: false
+        show-ignored: false
+        audit: true
+
+  gosmopolitan:
+    allow-time-local: true
+    escape-hatches: []
+    ignore-tests: false
+    watch-for-scripts: []
+
+  govet:
+    check-shadowing: true
+
+    settings:
+      shadow:
+        strict: false
+      unusedresult:
+        funcs: []
+        stringmethods: []
+
+    enable-all: true
+    disable:
+      - fieldalignment
+
+  importas:
+    no-unaliased: true
+    no-extra-aliases: false
+    alias: []
+
+  loggercheck:
+    kitlog: false
+    klog: false
+    logr: false
+    zap: true
+    require-string-key: false
+    no-printf-like: true
+    rules: []
+
+  makezero:
+    always: false
+
+  musttag:
+    functions:
+      - name: github.com/goccy/go-json.Marshal
+        tag: json
+      - name: github.com/goccy/go-json.MarshalContext
+        tag: json
+      - name: github.com/goccy/go-json.Unmarshal
+        tag: json
+      - name: github.com/goccy/go-json.UnmarshalContext
+        tag: json
+
+  nestif:
+    min-complexity: 3
+
+  nilnil:
+    checked-types:
+      - ptr
+      - func
+      - iface
+      - map
+      - chan
+
+  nolintlint:
+    allow-unused: false
+    allow-no-explanation: []
+    require-explanation: true
+    require-specific: true
+
+  nonamedreturns:
+    report-error-in-defer: false
+
+  paralleltest:
+    ignore-missing: true
+
+  prealloc:
+    simple: true
+    range-loops: true
+    for-loops: true
+
+  predeclared:
+    ignore: ""
+    q: false
+
+  promlinter:
+    strict: true
+    disabled-linters: []
+
+  reassign:
+    patterns:
+      - ".*"
+
+  revive:
+    max-open-files: 2048
+    ignore-generated-header: false
+    severity: warning
+    enable-all-rules: true
+    confidence: 0.1
+
+    # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md
+    rules:
+      - name: add-constant
+        disabled: true
+      - name: argument-limit
+        disabled: true
+      - name: atomic
+        severity: warning
+        disabled: false
+      - name: banned-characters
+        disabled: true
+      - name: bare-return
+        severity: warning
+        disabled: false
+      - name: blank-imports
+        severity: warning
+        disabled: false
+      - name: bool-literal-in-expr
+        severity: warning
+        disabled: false
+      - name: call-to-gc
+        severity: warning
+        disabled: false
+      - name: cognitive-complexity
+        disabled: true
+      - name: comment-spacings
+        severity: warning
+        disabled: false
+        arguments: []
+      - name: confusing-naming
+        severity: warning
+        disabled: false
+      - name: confusing-results
+        severity: warning
+        disabled: false
+      - name: constant-logical-expr
+        severity: warning
+        disabled: false
+      - name: context-as-argument
+        severity: warning
+        disabled: false
+        arguments:
+          - allowTypesBefore: ""
+      - name: context-keys-type
+        severity: warning
+        disabled: false
+      - name: cyclomatic
+        disabled: true
+      - name: datarace
+        severity: warning
+        disabled: false
+      - name: deep-exit
+        severity: warning
+        disabled: false
+      - name: defer
+        severity: warning
+        disabled: false
+        arguments:
+          - ["call-chain", "loop"]
+      - name: dot-imports
+        severity: warning
+        disabled: false
+      - name: duplicated-imports
+        severity: warning
+        disabled: false
+      - name: early-return
+        severity: warning
+        disabled: false
+      - name: empty-block
+        severity: warning
+        disabled: false
+      - name: empty-lines
+        severity: warning
+        disabled: false
+      - name: error-naming
+        severity: warning
+        disabled: false
+      - name: error-return
+        severity: warning
+        disabled: false
+      - name: error-strings
+        severity: warning
+        disabled: false
+      - name: errorf
+        severity: warning
+        disabled: false
+      - name: exported
+        severity: warning
+        disabled: false
+        arguments:
+          - "checkPrivateReceivers"
+          - "sayRepetitiveInsteadOfStutters"
+      - name: file-header
+        disabled: true
+      - name: flag-parameter
+        severity: warning
+        disabled: false
+      - name: function-result-limit
+        disabled: true
+      - name: function-length
+        disabled: true
+      - name: get-return
+        severity: warning
+        disabled: false
+      - name: identical-branches
+        severity: warning
+        disabled: false
+      - name: if-return
+        severity: warning
+        disabled: false
+      - name: increment-decrement
+        severity: warning
+        disabled: false
+      - name: indent-error-flow
+        severity: warning
+        disabled: false
+      - name: imports-blacklist
+        disabled: true
+      - name: import-shadowing
+        disabled: true
+      - name: line-length-limit
+        severity: warning
+        disabled: false
+        arguments: [ 140 ]
+      - name: max-public-structs
+        disabled: true
+      - name: modifies-parameter
+        severity: warning
+        disabled: false
+      - name: modifies-value-receiver
+        severity: warning
+        disabled: false
+      - name: nested-structs
+        severity: warning
+        disabled: false
+      - name: optimize-operands-order
+        disabled: true
+      - name: package-comments
+        severity: warning
+        disabled: false
+      - name: range
+        severity: warning
+        disabled: false
+      - name: range-val-in-closure
+        severity: warning
+        disabled: false
+      - name: range-val-address
+        severity: warning
+        disabled: false
+      - name: receiver-naming
+        severity: warning
+        disabled: false
+      - name: redefines-builtin-id
+        severity: warning
+        disabled: false
+      - name: string-of-int
+        severity: warning
+        disabled: false
+      - name: string-format
+        disabled: true
+      - name: struct-tag
+        disabled: true
+      - name: superfluous-else
+        severity: warning
+        disabled: false
+      - name: time-equal
+        severity: warning
+        disabled: false
+      - name: time-naming
+        severity: warning
+        disabled: false
+      - name: var-naming
+        severity: warning
+        disabled: false
+        arguments:
+          - [ "ID" ] # AllowList
+          - [ "VM" ] # DenyList
+      - name: var-declaration
+        severity: warning
+        disabled: false
+      - name: unconditional-recursion
+        severity: warning
+        disabled: false
+      - name: unexported-naming
+        severity: warning
+        disabled: false
+      - name: unexported-return
+        severity: warning
+        disabled: false
+      - name: unhandled-error
+        severity: warning
+        disabled: false
+        arguments:
+          - "fmt.Printf"
+      - name: unnecessary-stmt
+        severity: warning
+        disabled: false
+      - name: unreachable-code
+        severity: warning
+        disabled: false
+      - name: unused-parameter
+        severity: warning
+        disabled: false
+      - name: unused-receiver
+        severity: warning
+        disabled: false
+      - name: useless-break
+        severity: warning
+        disabled: false
+      - name: waitgroup-by-value
+        severity: warning
+        disabled: false
+
+  rowserrcheck:
+    packages: []
+
+  tagliatelle:
+    case:
+      use-field-name: false
+      rules:
+        json: snake
+        yaml: camel
+        xml: camel
+        bson: snake
+        avro: snake
+        mapstructure: camel
+        env: upperSnake
+        envconfig: upperSnake
+
+  tenv:
+    all: true
+
+  thelper:
+    test:
+      first: true
+      name: true
+      begin: true
+    benchmark:
+      first: true
+      name: true
+      begin: true
+    tb:
+      first: true
+      name: true
+      begin: true
+    fuzz:
+      first: true
+      name: true
+      begin: true
+
+  usestdlibvars:
+    http-method: true
+    http-status-code: true
+    time-weekday: true
+    time-month: true
+    time-layout: true
+    crypto-hash: true
+    default-rpc-path: true
+    sql-isolation-level: true
+    tls-signature-scheme: true
+    constant-kind: true
+
+  unparam:
+    check-exported: false
+
+  wsl:
+    strict-append: true
+    allow-assign-and-call: true
+    allow-assign-and-anything: false
+    allow-multiline-assign: true
+    force-case-trailing-whitespace: 0
+    allow-trailing-comment: false
+    allow-separated-leading-comment: false
+    allow-cuddle-declarations: false
+
+    allow-cuddle-with-calls: []
+    allow-cuddle-with-rhs: []
+
+    force-err-cuddling: false
+    error-variable-names:
+      - "err"
+
+    force-short-decl-cuddling: false
+
+  custom: {}
+
+linters:
+  enable-all: true
+  disable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - cyclop
+    - deadcode
+    - decorder
+    - depguard
+    - dupword
+    - errchkjson
+    - execinquery
+    - exhaustive
+    - exhaustivestruct
+    - exhaustruct
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - ginkgolinter
+    - gochecknoglobals
+    - gochecknoinits
+    - gocognit
+    - goconst
+    - gocyclo
+    - godox
+    - goerr113
+    - gofmt
+    - gofumpt
+    - goheader
+    - goimports
+    - golint
+    - gomnd
+    - gomoddirectives
+    - gosimple
+    - grouper
+    - ifshort
+    - interfacebloat
+    - interfacer
+    - ireturn
+    - lll
+    - maintidx
+    - maligned
+    - misspell
+    - nakedret
+    - nlreturn
+    - nonamedreturns
+    - nosnakecase
+    - scopelint
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - tagalign
+    - testpackage
+    - varcheck
+    - varnamelen
+    - whitespace
+    - wrapcheck
+    - zerologlint
+  fast: false
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  new: false
+  fix: false

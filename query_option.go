@@ -21,12 +21,13 @@ func QueryOptions[Q bun.Query](q Q, options ...QueryOption) Q {
 // Relations applies the given relations by their names (usually by a model struct related field) to bun.SelectQuery.
 func Relations(relations ...string) QueryOption {
 	return func(q bun.Query) {
-		if selectQuery, ok := q.(*bun.SelectQuery); ok {
-			for _, relation := range relations {
-				selectQuery.Relation(relation)
-			}
-		} else {
+		selectQuery, ok := q.(*bun.SelectQuery)
+		if !ok {
 			panic("Relations only works with SelectQuery")
+		}
+
+		for _, relation := range relations {
+			selectQuery.Relation(relation)
 		}
 	}
 }
@@ -34,11 +35,12 @@ func Relations(relations ...string) QueryOption {
 // SelectFor updates the bun.SelectQuery with the given FOR clause.
 func SelectFor(_for string) QueryOption {
 	return func(q bun.Query) {
-		if selectQuery, ok := q.(*bun.SelectQuery); ok {
-			selectQuery.For(_for + " OF ?TableAlias")
-		} else {
+		selectQuery, ok := q.(*bun.SelectQuery)
+		if !ok {
 			panic("SelectFor only works with SelectQuery")
 		}
+
+		selectQuery.For(_for + " OF ?TableAlias")
 	}
 }
 
@@ -83,22 +85,24 @@ func WhereAllWithDeleted() QueryOption {
 // Offset sets the bun.SelectQuery's offset.
 func Offset(offset int) QueryOption {
 	return func(q bun.Query) {
-		if selectQuery, ok := q.(*bun.SelectQuery); ok {
-			selectQuery.Offset(offset)
-		} else {
+		selectQuery, ok := q.(*bun.SelectQuery)
+		if !ok {
 			panic("Offset only works with SelectQuery")
 		}
+
+		selectQuery.Offset(offset)
 	}
 }
 
 // Limit sets the bun.SelectQuery's limit.
 func Limit(limit int) QueryOption {
 	return func(q bun.Query) {
-		if selectQuery, ok := q.(*bun.SelectQuery); ok {
-			selectQuery.Limit(limit)
-		} else {
+		selectQuery, ok := q.(*bun.SelectQuery)
+		if !ok {
 			panic("Limit only works with SelectQuery")
 		}
+
+		selectQuery.Limit(limit)
 	}
 }
 

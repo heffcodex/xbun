@@ -25,8 +25,9 @@ func (t *Timestamps) BeforeAppendModel(_ context.Context, query bun.Query) error
 
 		t.UpdatedAt = now
 	case *bun.UpdateQuery:
-		t.UpdatedAt = now
 		q.Column("updated_at")
+
+		t.UpdatedAt = now
 	}
 
 	return nil

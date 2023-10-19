@@ -16,13 +16,15 @@ type affectedXArgs struct {
 	wantErr          bool
 }
 
-func testAffectedX(t *testing.T, fn AffectedFn, tests []affectedXArgs) {
+func testAffectedX(t *testing.T, fn AffectedFn[int64], tests []affectedXArgs) {
+	t.Helper()
+
 	wantErr := &xerr.AffectedRowsError{}
 
 	for i, tt := range tests {
 		t.Run("test_"+strconv.Itoa(i), func(t *testing.T) {
 			err := fn(tt.expected)(tt.actual)
-			if err == nil && tt.wantErr == false {
+			if err == nil && !tt.wantErr {
 				return
 			}
 
@@ -32,7 +34,7 @@ func testAffectedX(t *testing.T, fn AffectedFn, tests []affectedXArgs) {
 }
 
 func TestAffectedExactly(t *testing.T) {
-	testAffectedX(t, AffectedExactly, []affectedXArgs{
+	testAffectedX(t, AffectedExactly[int64], []affectedXArgs{
 		{0, 0, false},
 		{1, 1, false},
 		{0, 1, true},
@@ -41,7 +43,7 @@ func TestAffectedExactly(t *testing.T) {
 }
 
 func TestAffectedNot(t *testing.T) {
-	testAffectedX(t, AffectedNot, []affectedXArgs{
+	testAffectedX(t, AffectedNot[int64], []affectedXArgs{
 		{0, 0, true},
 		{1, 1, true},
 		{0, 1, false},
@@ -50,7 +52,7 @@ func TestAffectedNot(t *testing.T) {
 }
 
 func TestAffectedLT(t *testing.T) {
-	testAffectedX(t, AffectedLT, []affectedXArgs{
+	testAffectedX(t, AffectedLT[int64], []affectedXArgs{
 		{0, 0, true},
 		{1, 1, true},
 		{0, 1, true},
@@ -59,7 +61,7 @@ func TestAffectedLT(t *testing.T) {
 }
 
 func TestAffectedLTE(t *testing.T) {
-	testAffectedX(t, AffectedLTE, []affectedXArgs{
+	testAffectedX(t, AffectedLTE[int64], []affectedXArgs{
 		{0, 0, false},
 		{1, 1, false},
 		{0, 1, true},
@@ -68,7 +70,7 @@ func TestAffectedLTE(t *testing.T) {
 }
 
 func TestAffectedGT(t *testing.T) {
-	testAffectedX(t, AffectedGT, []affectedXArgs{
+	testAffectedX(t, AffectedGT[int64], []affectedXArgs{
 		{0, 0, true},
 		{1, 1, true},
 		{0, 1, false},
@@ -77,7 +79,7 @@ func TestAffectedGT(t *testing.T) {
 }
 
 func TestAffectedGTE(t *testing.T) {
-	testAffectedX(t, AffectedGTE, []affectedXArgs{
+	testAffectedX(t, AffectedGTE[int64], []affectedXArgs{
 		{0, 0, false},
 		{1, 1, false},
 		{0, 1, false},
@@ -94,7 +96,7 @@ type dummyResult struct {
 	err      error
 }
 
-func (d dummyResult) LastInsertId() (int64, error) {
+func (dummyResult) LastInsertId() (int64, error) {
 	panic("implement me")
 }
 
@@ -109,25 +111,14 @@ func TestExpectSuccess(t *testing.T) {
 }
 
 func TestExpectResult(t *testing.T) {
-	t.Run("panics", func(t *testing.T) {
-		assert.NotPanics(t, func() {
-			_ = ExpectResult(dummyResult{}, nil)
-		})
-		assert.NotPanics(t, func() {
-			_ = ExpectResult(dummyResult{}, nil, nil)
-		})
-		assert.Panics(t, func() {
-			_ = ExpectResult(dummyResult{}, nil, nil, nil)
-		})
-	})
-
 	t.Run("success", func(t *testing.T) {
 		assert.NoError(t, ExpectResult(dummyResult{affected: 1}, nil))
-		assert.NoError(t, ExpectResult(dummyResult{affected: 1}, nil, AffectedNot(0)))
+		assert.NoError(t, ExpectResult(dummyResult{affected: 1}, nil, AffectedNot(0), AffectedNot(2)))
 	})
 
 	t.Run("mismatch", func(t *testing.T) {
 		assert.ErrorAs(t, ExpectResult(dummyResult{affected: 1}, nil, AffectedGT(1)), &xerr.AffectedRowsError{})
+		assert.ErrorAs(t, ExpectResult(dummyResult{affected: 1}, nil, AffectedLT(2), AffectedGT(1)), &xerr.AffectedRowsError{})
 	})
 
 	t.Run("no rows", func(t *testing.T) {
