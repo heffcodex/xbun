@@ -10,6 +10,8 @@ import (
 )
 
 func TestIsQueryExecution(t *testing.T) {
+	t.Parallel()
+
 	assert.False(t, IsQueryExecution(nil))
 	assert.False(t, IsQueryExecution(sql.ErrNoRows))
 

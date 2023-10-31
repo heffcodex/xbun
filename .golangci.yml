@@ -560,3 +560,8 @@ issues:
   max-same-issues: 0
   new: false
   fix: false
+  exclude-rules:
+    - path: "model_pk.go"
+      text: "confusing-naming: Method 'GetPK'"
+      linters:
+        - revive

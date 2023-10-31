@@ -2,11 +2,15 @@ package xbun
 
 import (
 	"github.com/uptrace/bun"
+	"golang.org/x/exp/constraints"
 )
 
 // QueryOption is a function that modifies a query.
 // See functions below implementing these modifiers.
 type QueryOption func(q bun.Query)
+
+// nopQueryOption is a QueryOption for internal use that does nothing.
+func nopQueryOption(_ bun.Query) {}
 
 // QueryOptions sequentially applies the given query options to the given query.
 // The function accepts and returns query with the same type Q, so you don't need to cast it back from interface{} by yourself.
@@ -82,32 +86,47 @@ func WhereAllWithDeleted() QueryOption {
 	}
 }
 
+// WhereDeletedFlag applies WhereDeleted or WhereAllWithDeleted option depending on the given QueryFlag.
+// As for underlying options, it's available for bun.SelectQuery, bun.UpdateQuery and bun.DeleteQuery only.
+func WhereDeletedFlag(flag QueryFlag) QueryOption {
+	switch flag {
+	case QueryFlagNone:
+		return nopQueryOption
+	case QueryFlagWith:
+		return WhereAllWithDeleted()
+	case QueryFlagOnly:
+		return WhereDeleted()
+	default:
+		panic("invalid flag") // this should never happen
+	}
+}
+
 // Offset sets the bun.SelectQuery's offset.
-func Offset(offset int) QueryOption {
+func Offset[Int constraints.Integer](offset Int) QueryOption {
 	return func(q bun.Query) {
 		selectQuery, ok := q.(*bun.SelectQuery)
 		if !ok {
 			panic("Offset only works with SelectQuery")
 		}
 
-		selectQuery.Offset(offset)
+		selectQuery.Offset(int(offset))
 	}
 }
 
 // Limit sets the bun.SelectQuery's limit.
-func Limit(limit int) QueryOption {
+func Limit[Int constraints.Integer](limit Int) QueryOption {
 	return func(q bun.Query) {
 		selectQuery, ok := q.(*bun.SelectQuery)
 		if !ok {
 			panic("Limit only works with SelectQuery")
 		}
 
-		selectQuery.Limit(limit)
+		selectQuery.Limit(int(limit))
 	}
 }
 
 // Paginate implements simple limit-offset-based pagination for bun.SelectQuery.
-func Paginate(page, per int) QueryOption {
+func Paginate[Int constraints.Integer](page, per Int) QueryOption {
 	return func(q bun.Query) {
 		QueryOptions(q,
 			Offset((page-1)*per),

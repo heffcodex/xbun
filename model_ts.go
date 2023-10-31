@@ -32,7 +32,3 @@ func (t *Timestamps) BeforeAppendModel(_ context.Context, query bun.Query) error
 
 	return nil
 }
-
-type SoftDelete struct {
-	DeletedAt bun.NullTime `bun:"deleted_at,soft_delete,nullzero"`
-}

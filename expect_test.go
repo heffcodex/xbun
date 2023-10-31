@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/heffcodex/xbun/xerr"
 )
@@ -28,7 +28,7 @@ func testAffectedX(t *testing.T, fn AffectedFn[int64], tests []affectedXArgs) {
 				return
 			}
 
-			assert.ErrorAs(t, err, wantErr)
+			require.ErrorAs(t, err, wantErr)
 		})
 	}
 }
@@ -105,33 +105,45 @@ func (d dummyResult) RowsAffected() (int64, error) {
 }
 
 func TestExpectSuccess(t *testing.T) {
-	assert.NoError(t, ExpectSuccess(nil))
-	assert.ErrorAs(t, ExpectSuccess(sql.ErrNoRows), &xerr.AffectedRowsError{})
-	assert.ErrorAs(t, ExpectSuccess(errors.New("")), &xerr.QueryExecutionError{})
+	t.Parallel()
+
+	require.NoError(t, ExpectSuccess(nil))
+	require.ErrorAs(t, ExpectSuccess(sql.ErrNoRows), &xerr.AffectedRowsError{})
+	require.ErrorAs(t, ExpectSuccess(errors.New("")), &xerr.QueryExecutionError{})
 }
 
 func TestExpectResult(t *testing.T) {
+	t.Parallel()
+
 	t.Run("success", func(t *testing.T) {
-		assert.NoError(t, ExpectResult(dummyResult{affected: 1}, nil))
-		assert.NoError(t, ExpectResult(dummyResult{affected: 1}, nil, AffectedNot(0), AffectedNot(2)))
+		t.Parallel()
+
+		require.NoError(t, ExpectResult(dummyResult{affected: 1}, nil))
+		require.NoError(t, ExpectResult(dummyResult{affected: 1}, nil, AffectedNot(0), AffectedNot(2)))
 	})
 
 	t.Run("mismatch", func(t *testing.T) {
-		assert.ErrorAs(t, ExpectResult(dummyResult{affected: 1}, nil, AffectedGT(1)), &xerr.AffectedRowsError{})
-		assert.ErrorAs(t, ExpectResult(dummyResult{affected: 1}, nil, AffectedLT(2), AffectedGT(1)), &xerr.AffectedRowsError{})
+		t.Parallel()
+
+		require.ErrorAs(t, ExpectResult(dummyResult{affected: 1}, nil, AffectedGT(1)), &xerr.AffectedRowsError{})
+		require.ErrorAs(t, ExpectResult(dummyResult{affected: 1}, nil, AffectedLT(2), AffectedGT(1)), &xerr.AffectedRowsError{})
 	})
 
 	t.Run("no rows", func(t *testing.T) {
-		assert.NoError(t, ExpectResult(dummyResult{}, sql.ErrNoRows, AffectedExactly(0)))
-		assert.ErrorAs(t, ExpectResult(dummyResult{}, sql.ErrNoRows), &xerr.AffectedRowsError{})
-		assert.ErrorAs(t, ExpectResult(dummyResult{}, sql.ErrNoRows, AffectedGT(0)), &xerr.AffectedRowsError{})
+		t.Parallel()
+
+		require.NoError(t, ExpectResult(dummyResult{}, sql.ErrNoRows, AffectedExactly(0)))
+		require.ErrorAs(t, ExpectResult(dummyResult{}, sql.ErrNoRows), &xerr.AffectedRowsError{})
+		require.ErrorAs(t, ExpectResult(dummyResult{}, sql.ErrNoRows, AffectedGT(0)), &xerr.AffectedRowsError{})
 	})
 
 	t.Run("query error", func(t *testing.T) {
-		assert.ErrorAs(t, ExpectResult(dummyResult{}, errors.New("")), &xerr.QueryExecutionError{})
+		t.Parallel()
+		require.ErrorAs(t, ExpectResult(dummyResult{}, errors.New("")), &xerr.QueryExecutionError{})
 	})
 
 	t.Run("affected rows error", func(t *testing.T) {
-		assert.ErrorContains(t, ExpectResult(dummyResult{err: errors.New("")}, nil, AffectedExactly(0)), "get affected rows")
+		t.Parallel()
+		require.ErrorContains(t, ExpectResult(dummyResult{err: errors.New("")}, nil, AffectedExactly(0)), "get affected rows")
 	})
 }

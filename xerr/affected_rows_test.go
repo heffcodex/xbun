@@ -9,6 +9,8 @@ import (
 )
 
 func TestIsAffectedRows(t *testing.T) {
+	t.Parallel()
+
 	assert.False(t, IsAffectedRows(nil))
 	assert.False(t, IsAffectedRows(sql.ErrNoRows))
 
