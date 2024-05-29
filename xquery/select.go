@@ -182,7 +182,7 @@ func (s *Select[ID, M, C]) iterSoftCursor(
 	for next := true; next; {
 		q := s.buildQuery(db, &chunkModel).
 			Where(idColumnExpr+" > ?", cursor).
-			OrderExpr(idColumnExpr + " ASC").
+			OrderExpr(xbun.OrderExpr(idColumnExpr, xbun.OrderAsc)).
 			Limit(chunkSize)
 
 		err := xbun.ExpectSuccess(xbun.QueryOptions(q, options...).Scan(ctx))

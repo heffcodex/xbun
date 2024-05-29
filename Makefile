@@ -2,8 +2,15 @@
 all: lint test
 
 .PHONY: lint
-lint:
-	golangci-lint run ./...
+lint: _lint gci
+
+.PHONY: gci
+gci:
+	GCIMODULE=`go list -m` envsubst < .golangci.gcitpl.yml | golangci-lint run -c /dev/stdin $(LINTARGS) $(LINTPATH)
+
+.PHONY: _lint
+_lint:
+	golangci-lint run -c .golangci.yml $(LINTARGS) $(LINTPATH)
 
 .PHONY: test
 test:

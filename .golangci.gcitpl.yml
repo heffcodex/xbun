@@ -1,0 +1,35 @@
+run:
+  timeout: 10s
+  issues-exit-code: 1
+  tests: true
+  modules-download-mode: readonly
+  go: ""
+
+output:
+  formats:
+    - format: line-number
+  print-issued-lines: false
+  print-linter-name: true
+  uniq-by-line: true
+  sort-results: true
+
+linters-settings:
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix($GCIMODULE) # being envsubst'ed when called from Makefile
+    skip-generated: true
+    custom-order: true
+
+linters:
+  disable-all: true
+  enable:
+    - gci
+  fast: false
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  new: false
+  fix: false
