@@ -167,6 +167,8 @@ func (s *Select[ID, M, C]) iterNativeCursor(
 		if len(chunkModel) < chunkSize {
 			break
 		}
+
+		clear(chunkModel)
 	}
 
 	return tx.Commit()
@@ -206,6 +208,8 @@ func (s *Select[ID, M, C]) iterSoftCursor(
 		}
 
 		cursor = chunkModel[len(chunkModel)-1].GetPK()
+
+		clear(chunkModel)
 	}
 
 	return nil

@@ -7,7 +7,7 @@ require (
 	github.com/pierrec/xxHash v0.1.5
 	github.com/stretchr/testify v1.9.0
 	github.com/uptrace/bun v1.2.1
-	golang.org/x/exp v0.0.0-20240529005216-23cca8864a10
+	golang.org/x/exp v0.0.0-20240707233637-46b078467d37
 )
 
 require (
@@ -18,6 +18,6 @@ require (
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/sys v0.22.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
